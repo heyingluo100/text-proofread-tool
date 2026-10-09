@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  WPS 本地加载项注册文件（publish 模式）
+  WPS 本地加载项注册文件
   侧载时放到：%appdata%\kingsoft\wps\jsaddons\
-  下面 online 的 url 指向本加载项部署地址（本地开发时为 http://localhost:端口/）
+  url 直接填加载项部署地址（本地开发为 http://localhost:端口/wps-addin/）
 -->
 <jsplugins>
   <jsplugin name="textProofreader"
             type="wps"
-            url="online"
-            online="http://localhost:3889/wps-addin/">
-  </jsplugin>
+            url="http://localhost:3889/wps-addin/" />
 </jsplugins>

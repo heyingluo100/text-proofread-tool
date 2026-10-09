@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<JsPlugin>
+  <ApiVersion>1.0.0</ApiVersion>
+  <Name>TextProofreader</Name>
+  <Description>文本校对工具：对标现代汉语规范体系，检测错别字、异形词、标点问题</Description>
+</JsPlugin>

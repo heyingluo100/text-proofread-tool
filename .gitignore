@@ -1,6 +1,9 @@
 node_modules/
 dist/
 dev.log
+addin-serve.log
+debug.log
+.debugTemp/
 .DS_Store
 *.local
 .skills/
