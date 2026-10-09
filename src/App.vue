@@ -38,6 +38,10 @@ const catMeta = {
 
 const checking = ref(false)
 const grammarError = ref('')
+const grammarProgress = ref('')   // 分段进度提示文案
+
+// 长文阈值：超过则分段（与后端 SEG_MAX 一致）
+const LONG_THRESHOLD = 1500
 
 async function runCheck() {
   if (checking.value) return
@@ -48,17 +52,32 @@ async function runCheck() {
   checked.value = true
   editing.value = false
   grammarError.value = ''
+  grammarProgress.value = text.value.length > LONG_THRESHOLD ? '文本较长，正在分段校对…' : '正在查病句…'
   scheduleLayout()
 
   checking.value = true
-  const res = await grammarClient.check(text.value)
+  await grammarClient.checkStream(text.value, {
+    onPlan(segments) {
+      grammarProgress.value = segments > 1
+        ? `文本较长，共分 ${segments} 段校对…`
+        : '正在查病句…'
+    },
+    onProgress(cur, total) {
+      grammarProgress.value = total > 1 ? `正在校对第 ${cur}/${total} 段…` : '正在查病句…'
+    },
+    onSegment(segIssues) {
+      // 逐段把病句追加进列表，实时可见
+      issues.value = issues.value.concat(segIssues)
+      scheduleLayout()
+    },
+    onDone(result) {
+      if (!result.ok) grammarError.value = result.error || '病句校对失败'
+      else issues.value = local.concat(result.issues || [])
+      scheduleLayout()
+    }
+  })
   checking.value = false
-  if (!res.ok) {
-    grammarError.value = res.error
-  } else {
-    issues.value = local.concat(res.issues || [])
-  }
-  scheduleLayout()
+  grammarProgress.value = ''
 }
 
 // 测量每处波浪线纵向位置，把批注对齐过去，重叠则向下避让
@@ -186,7 +205,7 @@ onBeforeUnmount(() => {
       <h1 class="text-lg font-semibold">文本校对工具</h1>
       <span class="text-sm text-gray-400 hidden sm:inline">对标现代汉语规范体系</span>
       <div class="ml-auto flex items-center gap-2">
-        <span v-if="checking" class="text-sm text-violet-600">正在查病句…</span>
+        <span v-if="checking" class="text-sm text-violet-600">{{ grammarProgress || '正在查病句…' }}</span>
         <span v-else-if="grammarError" class="text-sm text-red-500" :title="grammarError">AI 病句未校对</span>
         <span class="text-sm text-gray-500 mr-1">字数 {{ charCount }}</span>
         <button class="px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-gray-50"

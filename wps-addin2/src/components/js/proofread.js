@@ -21,10 +21,10 @@ function check() {
   return proofread(text)
 }
 
-// 病句校对（调后端大模型），异步
-async function grammarCheck(text) {
+// 病句校对（调后端大模型），异步（流式，带分段进度回调）
+async function grammarCheck(text, cb) {
   const t = text != null ? text : readDocText()
-  return grammarClient.check(t)
+  return grammarClient.checkStream(t, cb)
 }
 
 // 读文档文字（供病句校对传入）

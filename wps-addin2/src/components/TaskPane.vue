@@ -60,7 +60,7 @@ export default {
       statusCls.value = cls || ''
     }
 
-    // 本地规则即时出结果；再异步补病句（AI 判定）
+    // 本地规则即时出结果；再异步补病句（AI 判定，长文分段流式）
     async function runCheck() {
       if (checking.value) return
       activeId.value = null
@@ -68,15 +68,22 @@ export default {
         const text = proofread.readText()
         const local = proofread.check()
         issues.value = local
-        if (local.length === 0) setStatus('本地检查完成，正在查病句…', '')
-        else setStatus('本地 ' + local.length + ' 处，正在查病句…', '')
+        const longHint = text.length > 1500 ? '文本较长，正在分段校对…' : '正在查病句…'
+        setStatus(local.length === 0 ? '本地检查完成，' + longHint : '本地 ' + local.length + ' 处，' + longHint, '')
 
         checking.value = true
-        const res = await proofread.grammarCheck(text)
-        // 把病句追加到列表（本地结果保持在前）
-        issues.value = local.concat(res.issues || [])
+        const res = await proofread.grammarCheck(text, {
+          onPlan(segments) {
+            if (segments > 1) setStatus('文本较长，共分 ' + segments + ' 段校对…', '')
+          },
+          onProgress(cur, total) {
+            if (total > 1) setStatus('正在校对第 ' + cur + '/' + total + ' 段…', '')
+          },
+          onSegment(segIssues) {
+            issues.value = issues.value.concat(segIssues)
+          }
+        })
         checking.value = false
-
         const total = issues.value.length
         if (!res.ok) {
           setStatus('✓ 本地 ' + local.length + ' 处；病句未能校对：' + res.error, 'err')

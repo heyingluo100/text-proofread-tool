@@ -29,8 +29,11 @@ def _loads(reply: str):
     return []
 
 
-def to_issues(reply: str, text: str):
-    """转换为 issue 列表。每条在原文定位 wrong 片段。"""
+def to_issues(reply: str, text: str, offset: int = 0, id_prefix: str = "ai"):
+    """转换为 issue 列表。每条在原文定位 wrong 片段。
+
+    offset: 该片段在全文中的起始偏移（分段校对时用），定位结果加上它回到全文坐标。
+    """
     raw = _loads(reply)
     issues = []
     uid = 0
@@ -42,11 +45,12 @@ def to_issues(reply: str, text: str):
         note = (item.get("note") or "").strip()
         if not wrong or not right:
             continue
-        # 在原文定位（取首次出现；找不到则 index=-1，前端不定位但仍展示）
-        idx = text.find(wrong)
+        # 在本段内定位，再加 offset 回到全文坐标（找不到则 index=-1）
+        local = text.find(wrong)
+        idx = (offset + local) if local >= 0 else -1
         uid += 1
         issues.append({
-            "id": f"ai{uid}",
+            "id": f"{id_prefix}{uid}",
             "category": "grammar",
             "categoryLabel": "病句/语法",
             "index": idx,
