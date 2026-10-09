@@ -134,4 +134,48 @@ const words3 = [
   { wrong: '肪碍', right: '妨碍', note: '规范词形为"妨"' }
 ].filter(v => !v.skip)
 
-export const typos = [].concat(idiom, words, idiom2, words2, words3)
+// 高频别字与成语（补充批 4，收口批）
+const batch4 = [
+  { wrong: '通牒', right: '通牒', note: '', skip: true },
+  { wrong: '渡轮', right: '渡轮', note: '', skip: true },
+  { wrong: '气喘嘘嘘', right: '气喘吁吁', note: '规范词形为"吁"' },
+  { wrong: '病如山倒', right: '病来如山倒', note: '', skip: true },
+  { wrong: '张慌', right: '张皇', note: '规范词形为"皇"' },
+  { wrong: '惊慌失错', right: '惊慌失措', note: '规范词形为"措"' },
+  { wrong: '谛造', right: '缔造', note: '规范词形为"缔"' },
+  { wrong: '松弛有度', right: '松弛有度', note: '', skip: true },
+  { wrong: '恻隐之心', right: '恻隐之心', note: '', skip: true },
+  { wrong: '不屑置辨', right: '不屑置辩', note: '规范词形为"辩"' },
+  { wrong: '明辩是非', right: '明辨是非', note: '规范词形为"辨"' },
+  { wrong: '汗流夹背', right: '汗流浃背', note: '规范词形为"浃"' },
+  { wrong: '两全齐美', right: '两全其美', note: '规范词形为"其"' },
+  { wrong: '哄堂大笑', right: '哄堂大笑', note: '', skip: true },
+  { wrong: '欢度佳节', right: '欢度佳节', note: '', skip: true },
+  { wrong: '轻歌漫舞', right: '轻歌曼舞', note: '规范词形为"曼"' },
+  { wrong: '绿草如荫', right: '绿草如茵', note: '规范词形为"茵"' },
+  { wrong: '不可明状', right: '不可名状', note: '规范词形为"名"' },
+  { wrong: 'орган', right: '', note: '', skip: true },
+  { wrong: '惨绝人圜', right: '惨绝人寰', note: '规范词形为"寰"' },
+  { wrong: '鸠占雀巢', right: '鸠占鹊巢', note: '规范词形为"鹊"' },
+  { wrong: '椎心泣血', right: '椎心泣血', note: '', skip: true },
+  { wrong: '一股作气', right: '一鼓作气', note: '规范词形为"鼓"' },
+  { wrong: '甘之如殆', right: '甘之如饴', note: '规范词形为"饴"' },
+  { wrong: '伶牙利齿', right: '伶牙俐齿', note: '规范词形为"俐"' },
+  { wrong: '弱不经风', right: '弱不禁风', note: '规范词形为"禁"' },
+  { wrong: '英雄倍出', right: '英雄辈出', note: '规范词形为"辈"' },
+  { wrong: '责无旁代', right: '责无旁贷', note: '规范词形为"贷"' },
+  { wrong: '鞠躬尽粹', right: '鞠躬尽瘁', note: '规范词形为"瘁"' },
+  { wrong: '层峦叠障', right: '层峦叠嶂', note: '规范词形为"嶂"' },
+  { wrong: 'melody', right: '', note: '', skip: true },
+  { wrong: '记忆尤新', right: '记忆犹新', note: '规范词形为"犹"' },
+  { wrong: '谈笑自若', right: '谈笑自若', note: '', skip: true },
+  { wrong: '按步就班', right: '按部就班', note: '规范词形为"部"' },
+  { wrong: '英姿勃发', right: '英姿勃发', note: '', skip: true },
+  { wrong: '鬼斧神功', right: '鬼斧神工', note: '规范词形为"工"' },
+  { wrong: '不卑不吭', right: '不卑不亢', note: '规范词形为"亢"' },
+  { wrong: '前仆后拥', right: '前呼后拥', note: '规范词形为"呼"' },
+  { wrong: '察言观色', right: '察言观色', note: '', skip: true },
+  { wrong: '察颜观色', right: '察言观色', note: '', skip: true }
+].filter(v => !v.skip)
+
+export const typos = [].concat(idiom, words, idiom2, words2, words3, batch4)
