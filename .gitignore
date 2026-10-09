@@ -7,3 +7,6 @@ debug.log
 .DS_Store
 *.local
 .skills/
+backend/server.log
+backend/__pycache__/
+*.pyc
