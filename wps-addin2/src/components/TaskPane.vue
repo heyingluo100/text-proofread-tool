@@ -2,7 +2,14 @@
   <div class="pr-wrap">
     <header class="pr-bar">
       <span class="pr-title">文本校对</span>
+      <button class="pr-btn pr-gear" @click="showCfg = !showCfg" title="设置后端地址">⚙</button>
     </header>
+
+    <div v-if="showCfg" class="pr-cfg">
+      <label>后端地址</label>
+      <input v-model="apiBase" class="pr-input" placeholder="http://localhost:8787" @change="saveApiBase" />
+      <button class="pr-btn" @click="saveApiBase">保存</button>
+    </div>
 
     <div class="pr-status" :class="statusCls">{{ status }}</div>
 
@@ -54,6 +61,23 @@ export default {
     const statusCls = ref('')
     const checking = ref(false)
     const dotClass = { typo: 'red', variant: 'amber', punctuation: 'blue', grammar: 'violet' }
+
+    // 后端地址设置（存 localStorage，换设备时改一次即可，无需重新打包）
+    const showCfg = ref(false)
+    const apiBase = ref('')
+    try {
+      apiBase.value = localStorage.getItem('proofreadApiBase') || ''
+    } catch (e) {}
+    function saveApiBase() {
+      try {
+        const v = apiBase.value.trim().replace(/\/$/, '')
+        if (v) localStorage.setItem('proofreadApiBase', v)
+        else localStorage.removeItem('proofreadApiBase')
+        setStatus('后端地址已保存：' + (v || '（默认 localhost:8787）'), 'ok')
+      } catch (e) {
+        setStatus('保存失败：' + e.message, 'err')
+      }
+    }
 
     function setStatus(msg, cls) {
       status.value = msg
@@ -117,7 +141,7 @@ export default {
       if (proofread.consumeAutorun()) runCheck()
     })
 
-    return { issues, activeId, status, statusCls, checking, dotClass, runCheck, locate, ignore }
+    return { issues, activeId, status, statusCls, checking, dotClass, runCheck, locate, ignore, showCfg, apiBase, saveApiBase }
   }
 }
 </script>
@@ -164,4 +188,9 @@ export default {
 .pr-dot.violet { background: #8b5cf6; }
 .pr-ai { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: #ede9fe; color: #7c3aed; }
 .pr-check:disabled { opacity: .6; cursor: default; }
+.pr-gear { padding: 2px 8px; font-size: 14px; }
+.pr-cfg { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #fff;
+  border-bottom: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
+.pr-cfg label { white-space: nowrap; }
+.pr-input { flex: 1; padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; min-width: 0; }
 </style>

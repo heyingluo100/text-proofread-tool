@@ -2,7 +2,10 @@
 // core 内核在项目根 core/，vite 会把它打包进来，产物自包含。
 import { proofread, createGrammarClient } from '../../../../core/index.js'
 
-const grammarClient = createGrammarClient()
+// 每次调用现建 client，以便重新读取「面板里改过的后端地址」（localStorage）
+function client() {
+  return createGrammarClient()
+}
 
 // 读取当前文档纯文本
 function readDocText() {
@@ -24,7 +27,7 @@ function check() {
 // 病句校对（调后端大模型），异步（流式，带分段进度回调）
 async function grammarCheck(text, cb) {
   const t = text != null ? text : readDocText()
-  return grammarClient.checkStream(t, cb)
+  return client().checkStream(t, cb)
 }
 
 // 读文档文字（供病句校对传入）

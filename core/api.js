@@ -1,9 +1,30 @@
 // 调后端的病句校对接口（纯 fetch，无框架依赖，网页/WPS 外壳共用）
-// 后端地址可配置：默认本地 8787。
+// 后端地址解析优先级：
+//   1) 运行时覆盖：localStorage 的 proofreadApiBase（换设备时不必重新打包，改一次即可）
+//   2) 构建期注入：VITE_GRAMMAR_API_BASE 环境变量
+//   3) 默认本地：http://localhost:8787
 
 const DEFAULT_BASE = 'http://localhost:8787'
 
-export function createGrammarClient(baseUrl = DEFAULT_BASE) {
+function resolveBase(explicit) {
+  if (explicit) return explicit
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const v = localStorage.getItem('proofreadApiBase')
+      if (v) return v.replace(/\/$/, '')
+    }
+  } catch (e) {}
+  try {
+    // 构建期注入（vite 会把 import.meta.env 静态替换）
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GRAMMAR_API_BASE) {
+      return import.meta.env.VITE_GRAMMAR_API_BASE
+    }
+  } catch (e) {}
+  return DEFAULT_BASE
+}
+
+export function createGrammarClient(baseUrl) {
+  const BASE = resolveBase(baseUrl)
   return {
     /**
      * 请求病句校对（非流式，兼容用）。
@@ -11,7 +32,7 @@ export function createGrammarClient(baseUrl = DEFAULT_BASE) {
      */
     async check(text) {
       try {
-        const resp = await fetch(baseUrl + '/api/grammar-check', {
+        const resp = await fetch(BASE + '/api/grammar-check', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text })
@@ -33,7 +54,7 @@ export function createGrammarClient(baseUrl = DEFAULT_BASE) {
      */
     async checkStream(text, cb = {}) {
       try {
-        const resp = await fetch(baseUrl + '/api/grammar-check-stream', {
+        const resp = await fetch(BASE + '/api/grammar-check-stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text })
