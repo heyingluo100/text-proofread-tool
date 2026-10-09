@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
-import { proofread } from './rules/checker.js'
+import { proofread } from '../core/index.js'
 
 const SAMPLE = `今天我迫不急待地去参加比赛，结果松驰下来后发挥失常。这件事首当其冲 , 让我一愁莫展。
 按装软件时遇到问题，我扫瞄了说明书也没找到答案!!我决定渡假散心，顺便查查辞典。`
