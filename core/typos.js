@@ -1,24 +1,66 @@
-// 常见错别字/别字库（演示集，对标现代汉语规范词形）
+// 常见错别字/别字库（对标现代汉语规范词形）
 // 每条: { wrong, right, note }
-export const typos = [
+//   wrong = 错误写法（命中即标），right = 规范写法
+// 分区：成语误写 / 常见词语别字 / 易混字词
+// 说明：收录的是语言规范事实（如"迫不及待"不写"迫不急待"），非词典词条数据。
+
+const idiom = [
   { wrong: '迫不急待', right: '迫不及待', note: '规范词形为"及"' },
-  { wrong: '按装', right: '安装', note: '规范词形为"安"' },
-  { wrong: '渡假', right: '度假', note: '时间用"度"，水域用"渡"' },
-  { wrong: '必竟', right: '毕竟', note: '规范词形为"毕"' },
-  { wrong: '扫瞄', right: '扫描', note: '规范词形为"描"' },
-  { wrong: '松驰', right: '松弛', note: '规范词形为"弛"' },
-  { wrong: '煞废苦心', right: '煞费苦心', note: '规范词形为"费"' },
   { wrong: '一愁莫展', right: '一筹莫展', note: '规范词形为"筹"' },
   { wrong: '重蹈复辙', right: '重蹈覆辙', note: '规范词形为"覆"' },
-  { wrong: '脉博', right: '脉搏', note: '规范词形为"搏"' },
-  { wrong: '元霄', right: '元宵', note: '节令食品用"宵"' },
+  { wrong: '煞废苦心', right: '煞费苦心', note: '规范词形为"费"' },
   { wrong: '金榜提名', right: '金榜题名', note: '规范词形为"题"' },
   { wrong: '走头无路', right: '走投无路', note: '规范词形为"投"' },
   { wrong: '甘败下风', right: '甘拜下风', note: '规范词形为"拜"' },
   { wrong: '不加思索', right: '不假思索', note: '规范词形为"假"' },
   { wrong: '破斧沉舟', right: '破釜沉舟', note: '规范词形为"釜"' },
+  { wrong: '再接再励', right: '再接再厉', note: '规范词形为"厉"' },
+  { wrong: '谈笑风声', right: '谈笑风生', note: '规范词形为"生"' },
+  { wrong: '世外桃园', right: '世外桃源', note: '规范词形为"源"' },
+  { wrong: '要言不繁', right: '要言不烦', note: '规范词形为"烦"' },
+  { wrong: '变本加利', right: '变本加厉', note: '规范词形为"厉"' },
+  { wrong: '病入膏盲', right: '病入膏肓', note: '规范词形为"肓"' },
+  { wrong: '阴谋鬼计', right: '阴谋诡计', note: '规范词形为"诡"' },
+  { wrong: '出奇不意', right: '出其不意', note: '规范词形为"其"' },
+  { wrong: '礼上往来', right: '礼尚往来', note: '规范词形为"尚"' },
+  { wrong: '仗义直言', right: '仗义执言', note: '规范词形为"执"' },
+  { wrong: '穿流不息', right: '川流不息', note: '规范词形为"川"' },
+  { wrong: '一如继往', right: '一如既往', note: '规范词形为"既"' },
+  { wrong: '错落有志', right: '错落有致', note: '规范词形为"致"' }
+]
+
+// 常见词语别字
+const words = [
+  { wrong: '按装', right: '安装', note: '规范词形为"安"' },
+  { wrong: '松驰', right: '松弛', note: '规范词形为"弛"' },
+  { wrong: '扫瞄', right: '扫描', note: '规范词形为"描"' },
+  { wrong: '渡假', right: '度假', note: '时间用"度"，水域用"渡"' },
+  { wrong: '必竟', right: '毕竟', note: '规范词形为"毕"' },
+  { wrong: '脉博', right: '脉搏', note: '规范词形为"搏"' },
+  { wrong: '元霄', right: '元宵', note: '节令食品用"宵"' },
+  { wrong: '通霄', right: '通宵', note: '整夜用"宵"' },
   { wrong: '国藉', right: '国籍', note: '规范词形为"籍"' },
   { wrong: '伏卧撑', right: '俯卧撑', note: '规范词形为"俯"' },
-  { wrong: '通霄', right: '通宵', note: '整夜用"宵"' },
-  { wrong: '气慨', right: '气概', note: '规范词形为"概"' }
+  { wrong: '气慨', right: '气概', note: '规范词形为"概"' },
+  { wrong: '幅射', right: '辐射', note: '规范词形为"辐"' },
+  { wrong: '布署', right: '部署', note: '规范词形为"部"' },
+  { wrong: '刻服', right: '克服', note: '规范词形为"克"' },
+  { wrong: '那怕', right: '哪怕', note: '规范词形为"哪"' },
+  { wrong: '即然', right: '既然', note: '规范词形为"既"' },
+  { wrong: '沉缅', right: '沉湎', note: '规范词形为"湎"' },
+  { wrong: '账蓬', right: '帐篷', note: '规范词形为"帐篷"' },
+  { wrong: '安祥', right: '安详', note: '规范词形为"详"' },
+  { wrong: '辨论', right: '辩论', note: '言语用"辩"' },
+  { wrong: '辩别', right: '辨别', note: '分辨用"辨"' },
+  { wrong: '部份', right: '部分', note: '规范词形为"分"' },
+  { wrong: '发浑', right: '发昏', note: '规范词形为"昏"' },
+  { wrong: '欧打', right: '殴打', note: '规范词形为"殴"' },
+  { wrong: '贪脏', right: '贪赃', note: '规范词形为"赃"' },
+  { wrong: '渲泄', right: '宣泄', note: '规范词形为"宣"' },
+  { wrong: '九洲', right: '九州', note: '行政区划用"州"' },
+  { wrong: '脚指', right: '脚趾', note: '规范词形为"趾"' }
 ]
+
+// TYPO_APPEND_PLACEHOLDER
+
+export const typos = [].concat(idiom, words)
