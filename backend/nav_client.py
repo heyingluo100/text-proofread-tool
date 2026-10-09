@@ -16,8 +16,8 @@ class NavError(Exception):
 # local-llm-cli CLI 脚本路径（用户全局 skills 目录）
 CLI_SCRIPT = str(Path.home() / ".claude" / "skills" / "local-llm-cli" / "scripts" / "main.ts")
 
-# 文本模型分组 ID（全局规则示例用 13，可按需覆盖）
-DEFAULT_GROUP_ID = os.environ.get("LLM_GROUP_ID", "13")
+# 文本模型分组 ID（当前可用：12 = 一代文字 gemini-2.5-flash-lite）
+DEFAULT_GROUP_ID = os.environ.get("LLM_GROUP_ID", "12")
 
 
 def _find_bun() -> str:
@@ -69,16 +69,16 @@ def chat(system: str, user: str, group_id: str = DEFAULT_GROUP_ID, timeout: int 
 def _extract_reply(stdout: str) -> str:
     """从 CLI 输出中提取模型回复文本。
 
-    CLI 可能输出日志 + 结果。优先找 JSON 结构里的 data/content，
-    回退为取最后一段非空输出。
+    CLI 会先打印日志行（[local-llm-cli] ... / 任务完成 等），再打印模型正文。
+    模型正文通常是**多行**的 JSON 数组，因此不能逐行取，要抓完整的 [ ... ] 块。
     """
-    text = stdout.strip()
-    # 尝试把整段按行扫，找最像模型回复的 JSON 或正文
-    for line in reversed(text.splitlines()):
-        line = line.strip()
-        if not line:
-            continue
-        # 命中 JSON 数组/对象直接返回该行
-        if line.startswith("[") or line.startswith("{"):
-            return line
-    return text
+    text = stdout
+    # 优先：抓第一个 '[' 到最后一个 ']' 之间的完整 JSON 数组（跨行）
+    start = text.find("[")
+    end = text.rfind("]")
+    if start != -1 and end != -1 and end > start:
+        return text[start:end + 1].strip()
+    # 回退：去掉 CLI 日志行后的剩余内容
+    lines = [ln for ln in text.splitlines()
+             if not ln.strip().startswith("[local-llm-cli]")]
+    return "\n".join(lines).strip()

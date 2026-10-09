@@ -8,10 +8,12 @@
 // 返回的 issue 结构见 checker.js 顶部注释。
 
 export { proofread, groupByCategory } from './checker.js'
+export { createGrammarClient } from './api.js'
 
 // 分类元数据：各外壳自行决定如何渲染（颜色/图标由外壳定）
 export const CATEGORY_META = {
   typo: { label: '错别字', color: '#ef4444' },
   variant: { label: '异形词', color: '#f59e0b' },
-  punctuation: { label: '标点符号', color: '#3b82f6' }
+  punctuation: { label: '标点符号', color: '#3b82f6' },
+  grammar: { label: '病句/语法', color: '#8b5cf6' }
 }

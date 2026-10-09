@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
-import { proofread } from '../core/index.js'
+import { proofread, createGrammarClient } from '../core/index.js'
+
+const grammarClient = createGrammarClient()
 
 const SAMPLE = `今天我迫不急待地去参加比赛，结果松驰下来后发挥失常。这件事首当其冲 , 让我一愁莫展。
 按装软件时遇到问题，我扫瞄了说明书也没找到答案!!我决定渡假散心，顺便查查辞典。`
@@ -30,15 +32,32 @@ const activeIndex = computed(() => activeIssues.value.findIndex(i => i.id === ac
 const catMeta = {
   typo: { label: '错别字', dot: 'bg-red-500', wave: 'wave-red' },
   variant: { label: '异形词', dot: 'bg-amber-500', wave: 'wave-amber' },
-  punctuation: { label: '标点符号', dot: 'bg-blue-500', wave: 'wave-blue' }
+  punctuation: { label: '标点符号', dot: 'bg-blue-500', wave: 'wave-blue' },
+  grammar: { label: '病句/语法', dot: 'bg-violet-500', wave: 'wave-violet' }
 }
 
-function runCheck() {
-  issues.value = proofread(text.value)
+const checking = ref(false)
+const grammarError = ref('')
+
+async function runCheck() {
+  if (checking.value) return
+  const local = proofread(text.value)
+  issues.value = local
   ignored.value = new Set()
   activeId.value = null
   checked.value = true
   editing.value = false
+  grammarError.value = ''
+  scheduleLayout()
+
+  checking.value = true
+  const res = await grammarClient.check(text.value)
+  checking.value = false
+  if (!res.ok) {
+    grammarError.value = res.error
+  } else {
+    issues.value = local.concat(res.issues || [])
+  }
   scheduleLayout()
 }
 
@@ -87,10 +106,18 @@ function goNext() {
   select(list[i >= list.length - 1 ? 0 : i + 1].id)
 }
 
+// 采纳本地问题：替换后只重跑本地规则（不重调大模型，避免每次采纳都等一次模型）
 function accept(issue) {
+  if (issue.index < 0) return   // AI 判定但未在原文定位到的，无法自动替换，交给用户手改
   const t = text.value
   text.value = t.slice(0, issue.index) + issue.right + t.slice(issue.index + issue.length)
-  runCheck()
+  const local = proofread(text.value)
+  // 保留仍有效的 AI 病句（原文未被破坏的），位置重算失败的直接丢弃
+  const keptAI = issues.value.filter(i => i.byAI && i.index >= 0 && text.value.indexOf(i.wrong) >= 0)
+  issues.value = local.concat(keptAI)
+  ignored.value = new Set()
+  activeId.value = null
+  scheduleLayout()
 }
 function ignore(issue) {
   ignored.value = new Set([...ignored.value, issue.id])
@@ -98,11 +125,15 @@ function ignore(issue) {
   scheduleLayout()
 }
 function acceptAll() {
-  const items = [...activeIssues.value].sort((a, b) => b.index - a.index)
+  // 只批量采纳能在原文定位到的问题（跳过 index<0 的 AI 项，避免错替换）
+  const items = activeIssues.value.filter(i => i.index >= 0).sort((a, b) => b.index - a.index)
   let t = text.value
   for (const it of items) t = t.slice(0, it.index) + it.right + t.slice(it.index + it.length)
   text.value = t
-  runCheck()
+  issues.value = proofread(text.value)
+  ignored.value = new Set()
+  activeId.value = null
+  scheduleLayout()
 }
 
 async function copyText() {
@@ -155,11 +186,13 @@ onBeforeUnmount(() => {
       <h1 class="text-lg font-semibold">文本校对工具</h1>
       <span class="text-sm text-gray-400 hidden sm:inline">对标现代汉语规范体系</span>
       <div class="ml-auto flex items-center gap-2">
+        <span v-if="checking" class="text-sm text-violet-600">正在查病句…</span>
+        <span v-else-if="grammarError" class="text-sm text-red-500" :title="grammarError">AI 病句未校对</span>
         <span class="text-sm text-gray-500 mr-1">字数 {{ charCount }}</span>
         <button class="px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-gray-50"
           @click="editing = !editing">{{ editing ? '退出编辑' : '编辑原文' }}</button>
-        <button class="px-4 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700"
-          @click="runCheck">开始校对</button>
+        <button class="px-4 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-60"
+          :disabled="checking" @click="runCheck">{{ checking ? '校对中…' : '开始校对' }}</button>
       </div>
     </header>
 
@@ -289,6 +322,7 @@ onBeforeUnmount(() => {
 .wave-red   { text-decoration: underline wavy #ef4444; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
 .wave-amber { text-decoration: underline wavy #f59e0b; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
 .wave-blue  { text-decoration: underline wavy #3b82f6; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+.wave-violet { text-decoration: underline wavy #8b5cf6; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
 
 /* 选中的正文错误：黄色底突出 */
 .mark-active { background: #fde68a; border-radius: 3px; }

@@ -13,6 +13,7 @@
         <div class="pr-head">
           <i class="pr-dot" :class="dotClass[it.category]"></i>
           <span class="pr-cat">{{ it.categoryLabel }}</span>
+          <span v-if="it.byAI" class="pr-ai">AI 判定</span>
         </div>
         <div class="pr-fix">
           <span class="pr-wrong">{{ it.wrong }}</span>
@@ -31,8 +32,11 @@
         <span class="lg"><i class="pr-dot red"></i>错别字</span>
         <span class="lg"><i class="pr-dot amber"></i>异形词</span>
         <span class="lg"><i class="pr-dot blue"></i>标点</span>
+        <span class="lg"><i class="pr-dot violet"></i>病句</span>
       </div>
-      <button class="pr-btn pr-primary pr-check" @click="runCheck">校对当前文档</button>
+      <button class="pr-btn pr-primary pr-check" :disabled="checking" @click="runCheck">
+        {{ checking ? '校对中…' : '校对当前文档' }}
+      </button>
     </footer>
   </div>
 </template>
@@ -46,23 +50,43 @@ export default {
   setup() {
     const issues = ref([])
     const activeId = ref(null)
-    const status = ref('点击上方按钮开始校对')
+    const status = ref('点击底部按钮开始校对')
     const statusCls = ref('')
-    const dotClass = { typo: 'red', variant: 'amber', punctuation: 'blue' }
+    const checking = ref(false)
+    const dotClass = { typo: 'red', variant: 'amber', punctuation: 'blue', grammar: 'violet' }
 
     function setStatus(msg, cls) {
       status.value = msg
       statusCls.value = cls || ''
     }
 
-    function runCheck() {
+    // 本地规则即时出结果；再异步补病句（AI 判定）
+    async function runCheck() {
+      if (checking.value) return
+      activeId.value = null
       try {
-        issues.value = proofread.check()
-        activeId.value = null
-        if (issues.value.length === 0) setStatus('✓ 未发现问题', 'ok')
-        else setStatus('共发现 ' + issues.value.length + ' 处问题', '')
+        const text = proofread.readText()
+        const local = proofread.check()
+        issues.value = local
+        if (local.length === 0) setStatus('本地检查完成，正在查病句…', '')
+        else setStatus('本地 ' + local.length + ' 处，正在查病句…', '')
+
+        checking.value = true
+        const res = await proofread.grammarCheck(text)
+        // 把病句追加到列表（本地结果保持在前）
+        issues.value = local.concat(res.issues || [])
+        checking.value = false
+
+        const total = issues.value.length
+        if (!res.ok) {
+          setStatus('✓ 本地 ' + local.length + ' 处；病句未能校对：' + res.error, 'err')
+        } else if (total === 0) {
+          setStatus('✓ 未发现问题', 'ok')
+        } else {
+          setStatus('共发现 ' + total + ' 处问题（含病句 ' + (res.issues || []).length + '）', '')
+        }
       } catch (e) {
-        issues.value = []
+        checking.value = false
         setStatus('校对失败：' + e.message, 'err')
       }
     }
@@ -86,7 +110,7 @@ export default {
       if (proofread.consumeAutorun()) runCheck()
     })
 
-    return { issues, activeId, status, statusCls, dotClass, runCheck, locate, ignore }
+    return { issues, activeId, status, statusCls, checking, dotClass, runCheck, locate, ignore }
   }
 }
 </script>
@@ -130,4 +154,7 @@ export default {
 .pr-dot.red { background: #ef4444; }
 .pr-dot.amber { background: #f59e0b; }
 .pr-dot.blue { background: #3b82f6; }
+.pr-dot.violet { background: #8b5cf6; }
+.pr-ai { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: #ede9fe; color: #7c3aed; }
+.pr-check:disabled { opacity: .6; cursor: default; }
 </style>

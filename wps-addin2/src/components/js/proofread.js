@@ -1,6 +1,8 @@
 // 校对适配层：读 WPS 文档 → 调 core 内核 → 定位到文档中的错误
 // core 内核在项目根 core/，vite 会把它打包进来，产物自包含。
-import { proofread } from '../../../../core/index.js'
+import { proofread, createGrammarClient } from '../../../../core/index.js'
+
+const grammarClient = createGrammarClient()
 
 // 读取当前文档纯文本
 function readDocText() {
@@ -13,10 +15,21 @@ function readDocText() {
   return doc.Content ? doc.Content.Text : (doc.Range().Text || '')
 }
 
-// 跑校对，返回问题数组
+// 本地规则校对（错别字/异形词/标点），同步秒出
 function check() {
   const text = readDocText()
   return proofread(text)
+}
+
+// 病句校对（调后端大模型），异步
+async function grammarCheck(text) {
+  const t = text != null ? text : readDocText()
+  return grammarClient.check(t)
+}
+
+// 读文档文字（供病句校对传入）
+function readText() {
+  return readDocText()
 }
 
 // 在文档中选中定位某个错误（index/length 为纯文本偏移）
@@ -41,4 +54,4 @@ function consumeAutorun() {
   return false
 }
 
-export default { check, locate, consumeAutorun }
+export default { check, grammarCheck, readText, locate, consumeAutorun }
