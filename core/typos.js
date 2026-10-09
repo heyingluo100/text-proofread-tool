@@ -61,6 +61,47 @@ const words = [
   { wrong: '脚指', right: '脚趾', note: '规范词形为"趾"' }
 ]
 
-// TYPO_APPEND_PLACEHOLDER
+// 成语误写（补充批）
+const idiom2 = [
+  { wrong: '原型毕露', right: '原形毕露', note: '规范词形为"形"' },
+  { wrong: '不径而走', right: '不胫而走', note: '规范词形为"胫"' },
+  { wrong: '合盘托出', right: '和盘托出', note: '规范词形为"和"' },
+  { wrong: '默守成规', right: '墨守成规', note: '规范词形为"墨"' },
+  { wrong: '名符其实', right: '名副其实', note: '规范词形为"副"' },
+  { wrong: '相形见拙', right: '相形见绌', note: '规范词形为"绌"' },
+  { wrong: '察颜观色', right: '察言观色', note: '规范词形为"言"' },
+  { wrong: '披星带月', right: '披星戴月', note: '规范词形为"戴"' },
+  { wrong: '直接了当', right: '直截了当', note: '规范词形为"截"' },
+  { wrong: '永保青春', right: '永葆青春', note: '规范词形为"葆"' },
+  { wrong: '融汇贯通', right: '融会贯通', note: '规范词形为"会"' },
+  { wrong: '旁证博引', right: '旁征博引', note: '规范词形为"征"' },
+  { wrong: '一张一驰', right: '一张一弛', note: '规范词形为"弛"' },
+  { wrong: '兴高彩烈', right: '兴高采烈', note: '规范词形为"采"' },
+  { wrong: '神彩奕奕', right: '神采奕奕', note: '规范词形为"采"' },
+  { wrong: '慢不经心', right: '漫不经心', note: '规范词形为"漫"' },
+  { wrong: '鬼鬼崇崇', right: '鬼鬼祟祟', note: '规范词形为"祟"' },
+  { wrong: '相辅相承', right: '相辅相成', note: '规范词形为"成"' },
+  { wrong: '卑恭屈膝', right: '卑躬屈膝', note: '规范词形为"躬"' },
+  { wrong: '幅圆辽阔', right: '幅员辽阔', note: '规范词形为"员"' },
+  { wrong: '随声附合', right: '随声附和', note: '规范词形为"和"' },
+  { wrong: '纷至踏来', right: '纷至沓来', note: '规范词形为"沓"' },
+  { wrong: '以身作责', right: '以身作则', note: '规范词形为"则"' }
+]
 
-export const typos = [].concat(idiom, words)
+// 常见词语别字（补充批）
+const words2 = [
+  { wrong: '装璜', right: '装潢', note: '规范词形为"潢"' },
+  { wrong: '峻工', right: '竣工', note: '规范词形为"竣"' },
+  { wrong: '报负', right: '抱负', note: '规范词形为"抱"' },
+  { wrong: '部置', right: '布置', note: '规范词形为"布"' },
+  { wrong: '寒喧', right: '寒暄', note: '规范词形为"暄"' },
+  { wrong: '座落', right: '坐落', note: '规范词形为"坐"' },
+  { wrong: '粗旷', right: '粗犷', note: '规范词形为"犷"' },
+  { wrong: '针贬', right: '针砭', note: '规范词形为"砭"' },
+  { wrong: '和霭', right: '和蔼', note: '规范词形为"蔼"' },
+  { wrong: '迁徒', right: '迁徙', note: '规范词形为"徙"' },
+  { wrong: '陷井', right: '陷阱', note: '规范词形为"阱"' },
+  { wrong: '腊烛', right: '蜡烛', note: '蜡烛用"蜡"' }
+]
+
+export const typos = [].concat(idiom, words, idiom2, words2)
