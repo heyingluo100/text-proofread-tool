@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- WPS 文字(wps) 工具栏定义：新增「校对」分组和按钮 -->
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="ribbonOnLoad">
+  <ribbon>
+    <tabs>
+      <tab id="tabProofread" label="文本校对">
+        <group id="grpProofread" label="校对">
+          <button id="btnProofread"
+                  label="开始校对"
+                  onAction="onProofreadClick"
+                  getImage="getBtnImage"
+                  size="large" />
+          <button id="btnToggle"
+                  label="校对面板"
+                  onAction="onToggleTaskPane"
+                  size="large" />
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>

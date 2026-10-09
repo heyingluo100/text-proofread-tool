@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>文本校对</title>
+  <link rel="stylesheet" href="taskpane.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="bar">
+      <span class="title">文本校对</span>
+      <button id="btn-check" class="btn btn-primary">校对当前文档</button>
+    </header>
+
+    <div id="status" class="status">点击上方按钮开始校对</div>
+
+    <ul id="list" class="list"></ul>
+
+    <footer class="foot">
+      <span class="legend"><i class="dot red"></i>错别字</span>
+      <span class="legend"><i class="dot amber"></i>异形词</span>
+      <span class="legend"><i class="dot blue"></i>标点</span>
+    </footer>
+  </div>
+
+  <script type="module" src="shell.js"></script>
+</body>
+</html>
