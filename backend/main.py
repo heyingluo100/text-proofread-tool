@@ -4,9 +4,12 @@
 安全：API key / 登录态只在后端（复用 CLI），绝不下发前端。
 """
 import json
+import os
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from prompt import build_messages
@@ -14,7 +17,7 @@ from parser import to_issues
 from segment import split_text
 from nav_client import chat, NavError
 
-app = FastAPI(title="文本校对后端", version="0.2.0")
+app = FastAPI(title="文本校对后端", version="0.3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -89,3 +92,11 @@ def grammar_check_stream(req: CheckReq):
         yield _sse("done", {"ok": True, "issues": all_issues, "segments": total})
 
     return StreamingResponse(gen(), media_type="text/event-stream")
+
+
+# ── 托管网页前端（同源：网页与病句 API 同端口，免 CORS/免单独起前端服务）──
+# dist 位于项目根的 dist/（backend 的上一级）。存在才挂载。
+_DIST = Path(__file__).resolve().parent.parent / "dist"
+if _DIST.is_dir():
+    # html=True 使根路径自动返回 index.html
+    app.mount("/", StaticFiles(directory=str(_DIST), html=True), name="web")
