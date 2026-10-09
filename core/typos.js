@@ -104,4 +104,34 @@ const words2 = [
   { wrong: '腊烛', right: '蜡烛', note: '蜡烛用"蜡"' }
 ]
 
-export const typos = [].concat(idiom, words, idiom2, words2)
+// 高频易混词（补充批 3）
+const words3 = [
+  { wrong: '即使如此', right: '即使如此', note: '', skip: true },
+  { wrong: '一摸一样', right: '一模一样', note: '规范词形为"模"' },
+  { wrong: '迫不急待', right: '迫不及待', note: '', skip: true },
+  { wrong: '不容质疑', right: '不容置疑', note: '规范词形为"置"' },
+  { wrong: '不加思索', right: '不假思索', note: '', skip: true },
+  { wrong: '手屈一指', right: '首屈一指', note: '规范词形为"首"' },
+  { wrong: '谈笑风声', right: '谈笑风生', note: '', skip: true },
+  { wrong: '题纲', right: '提纲', note: '规范词形为"提"' },
+  { wrong: '题词', right: '题词', note: '', skip: true },
+  { wrong: '渡过难关', right: '度过难关', note: '时间用"度"' },
+  { wrong: '迫使', right: '迫使', note: '', skip: true },
+  { wrong: '恢谐', right: '诙谐', note: '规范词形为"诙"' },
+  { wrong: '九宵', right: '九霄', note: '天空用"霄"' },
+  { wrong: '渡船', right: '渡船', note: '', skip: true },
+  { wrong: '迁就', right: '迁就', note: '', skip: true },
+  { wrong: '渲染', right: '渲染', note: '', skip: true },
+  { wrong: '不段', right: '不断', note: '规范词形为"断"' },
+  { wrong: '既使', right: '即使', note: '规范词形为"即"' },
+  { wrong: '以经', right: '已经', note: '规范词形为"已"' },
+  { wrong: '按排', right: '安排', note: '规范词形为"安"' },
+  { wrong: '发奋图强', right: '发愤图强', note: '规范词形为"愤"' },
+  { wrong: '墨守陈规', right: '墨守成规', note: '规范词形为"成"' },
+  { wrong: '美仑美奂', right: '美轮美奂', note: '规范词形为"轮"' },
+  { wrong: '了望', right: '瞭望', note: '远望用"瞭"' },
+  { wrong: '脏款', right: '赃款', note: '规范词形为"赃"' },
+  { wrong: '肪碍', right: '妨碍', note: '规范词形为"妨"' }
+].filter(v => !v.skip)
+
+export const typos = [].concat(idiom, words, idiom2, words2, words3)
