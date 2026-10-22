@@ -1,7 +1,7 @@
 """文本校对后端代理（病句/语法层）。
 
-职责：接收前端文本 → 长文分段 → 逐段调 local-llm-cli 模型查病句 → 流式返回结果。
-安全：API key / 登录态只在后端（复用 CLI），绝不下发前端。
+职责：接收前端文本 → 长文分段 → 逐段调 LLM 模型查病句 → 流式返回结果。
+安全：API key 只在后端持有，绝不下发前端。
 """
 import json
 import os
@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from prompt import build_messages
 from parser import to_issues
 from segment import split_text
-from nav_client import chat, NavError
+from llm_client import chat, LLMError
 
 app = FastAPI(title="文本校对后端", version="0.3.0")
 
@@ -57,7 +57,7 @@ def grammar_check(req: CheckReq):
             system, user = build_messages(seg)
             reply = chat(system, user)
             all_issues.extend(to_issues(reply, seg, offset, id_prefix=f"ai{i}_"))
-        except NavError as e:
+        except LLMError as e:
             return {"ok": False, "issues": all_issues, "segments": len(segments),
                     "error": f"第 {i + 1} 段失败：{e}"}
     return {"ok": True, "issues": all_issues, "segments": len(segments), "error": None}
@@ -85,7 +85,7 @@ def grammar_check_stream(req: CheckReq):
                 seg_issues = to_issues(reply, seg, offset, id_prefix=f"ai{i}_")
                 all_issues.extend(seg_issues)
                 yield _sse("segment", {"current": i + 1, "total": total, "issues": seg_issues})
-            except NavError as e:
+            except LLMError as e:
                 yield _sse("error", {"current": i + 1, "total": total, "error": str(e)})
                 yield _sse("done", {"ok": False, "issues": all_issues, "segments": total})
                 return
